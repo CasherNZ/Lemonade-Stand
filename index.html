@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lemonade Stand</title>
+<style>
+  :root{--bg:#0f172a;--panel:#111827;--muted:#94a3b8;--text:#e5e7eb;--accent:#f59e0b;--ok:#22c55e;--warn:#ef4444;--card:#0b1220;--border:#1f2937}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:linear-gradient(180deg,#0b1220,#0f172a);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+  h1{font-size:1.4rem;margin:0}
+  h2{font-size:1.05rem;margin:0 0 .5rem 0;color:var(--muted);font-weight:600}
+  .app{max-width:1200px;margin:20px auto;padding:16px}
+  .stat{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:10px 12px;display:flex;gap:8px;align-items:center}
+  .pill{background:#1f2937;padding:2px 8px;border-radius:999px;color:var(--muted);font-size:.8rem}
+  .grid{display:grid;grid-template-columns: 1.2fr .8fr;gap:16px;margin-top:16px}
+  @media (max-width:1000px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0}
+  .row label{min-width:160px;color:var(--muted)}
+  input[type=number], select{background:#0b1220;color:var(--text);border:1px solid #263246;border-radius:10px;padding:8px;width:160px}
+  input[type=number]:disabled{opacity:.6}
+  button{background:#1f2937;color:var(--text);border:1px solid #263246;border-radius:12px;padding:10px 14px;cursor:pointer}
+  button.primary{background:var(--accent);border-color:#d97706;color:#1f1f1f;font-weight:700}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .small{font-size:.85rem;color:var(--muted)}
+  .money{font-variant-numeric:tabular-nums}
+  .customers{display:grid;grid-template-columns:repeat(10,1fr);gap:8px}
+  .cust{background:var(--card);border:1px solid var(--border);border-radius:12px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+  .cust.buy{outline:2px solid var(--ok)}
+  .cust.skip{outline:2px solid #334155;opacity:.6}
+  .summary{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media (max-width:640px){.summary{grid-template-columns:1fr}}
+  .divider{height:1px;background:#1f2937;margin:10px 0}
+  .ok{color:var(--ok)}
+  .warn{color:var(--warn)}
+  .win{background:#052e16;border:1px solid #14532d}
+
+  /* Hero banner */
+  .hero{position:relative;overflow:hidden;border-radius:16px;border:1px solid var(--border);background:radial-gradient(1200px 200px at -10% -30%, #ffe27a22, transparent),radial-gradient(1200px 200px at 110% 130%, #7ad0ff22, transparent);} 
+  .heroInner{padding:16px 16px 12px;background:linear-gradient(90deg,#fff3b0 0%, #d9f99d 40%, #bbf7d0 100%);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;color:#0b1220}
+  .hero h1{font-size:1.6rem;color:#052e16;text-shadow:0 1px 0 #ffffff55}
+  .progress{height:10px;background:#111827;border:1px solid var(--border);border-radius:999px;overflow:hidden}
+  .progress>span{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#f59e0b);width:0}
+  .floaters{position:absolute;inset:0;pointer-events:none}
+  .lemon{position:absolute;font-size:24px;opacity:.6;animation:float 12s linear infinite}
+  .lemon:nth-child(1){left:5%;top:70%;animation-duration:13s}
+  .lemon:nth-child(2){left:25%;top:10%;animation-duration:16s}
+  .lemon:nth-child(3){left:60%;top:60%}
+  .lemon:nth-child(4){left:85%;top:20%;animation-duration:18s}
+  @keyframes float{0%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-14px) rotate(6deg)}100%{transform:translateY(0) rotate(0deg)}}
+
+  /* Forecast strip */
+  .forecast{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .fcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;text-align:center}
+  .fcard .name{font-weight:700}
+  .fcard .meta{font-size:.8rem;color:var(--muted)}
+  .fcard .hint{color:#cbd5e1}
+
+  /* Upgrades */
+  .upgRow{display:grid;grid-template-columns:1.2fr 1fr auto;align-items:center;gap:10px;margin:8px 0;padding:6px 8px;border:1px solid var(--border);border-radius:12px;background:#0c1528}
+  .upgRow .owned{color:var(--ok);font-weight:700}
+  .upgRow .item{font-weight:600}
+  .upgRow .desc{color:var(--muted);font-size:.9rem}
+  .actions{display:flex;align-items:center;gap:8px}
+
+  /* Shop tidy rows */
+  .shopRow{display:grid;grid-template-columns:1.2fr 1fr auto;align-items:center;gap:10px;margin:8px 0;padding:6px 8px;border:1px solid var(--border);border-radius:12px;background:#0c1528}
+  .shopRow .item{font-weight:600}
+  .shopRow .desc{color:var(--muted);font-size:.9rem}
+  .buyBtn{background:var(--accent);border-color:#d97706;color:#111;padding:10px 16px;border-radius:12px;font-weight:700}
+
+  /* Challenge box */
+  #challenge{background:#1a2440;border:1px solid #22314b;padding:10px;border-radius:12px}
+
+  /* Forecast background wrapper will be set dynamically */
+  #forecast{padding:8px;border-radius:12px}
+
+  /* Sale badge */
+  .sale{display:none;margin-left:8px;background:conic-gradient(#ffd166 0 25%,#f59e0b 0 50%,#ffd166 0 75%,#f59e0b 0);color:#111;padding:4px 8px;border-radius:8px;font-weight:800}
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="hero">
+      <div class="heroInner">
+        <div>
+          <h1>🍋 Lemonade Stand</h1>
+          <div class="small" id="todayLine">Today: —</div>
+          <div class="progress" aria-label="Profit progress to $1000"><span id="progBar"></span></div>
+        </div>
+        <div style="display:grid;gap:6px;justify-items:end">
+          <span id="visitorsPill" class="pill">Visitors today: 0</span>
+          <span class="pill">Daily rent $50</span>
+          <span id="capPill" class="pill">Price cap: $0.00</span>
+          <span id="winPill" class="pill" style="display:none">Target reached ✅</span>
+        </div>
+      </div>
+      <div class="floaters" aria-hidden="true">
+        <div class="lemon">🍋</div>
+        <div class="lemon">🧃</div>
+        <div class="lemon">🧊</div>
+        <div class="lemon">🍋</div>
+        <div class="lemon">🌿</div>
+        <div class="lemon">🌳</div>
+        <div class="lemon">🍋</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: Forecast + Controls -->
+      <div class="card">
+        <h2>Forecast</h2>
+        <div class="forecast" id="forecast"></div>
+        <div class="divider"></div>
+        <h2>Daily Challenge</h2>
+        <div id="challenge" class="small"></div>
+        <div class="divider"></div>
+        <h2>Recipe & Price</h2>
+        <div class="row"><label>🍋 Lemons / cup</label><input id="lemPer" type="number" step="0.1" min="0" value="1.5"></div>
+        <div class="row"><label>🍬 Sugar spoons / cup</label><input id="sugPer" type="number" step="0.5" min="0" value="2"></div>
+        <div class="row"><label>🧊 Ice cubes / cup</label><input id="icePer" type="number" step="1" min="0" value="3"></div>
+        <div class="row"><label>🏷️ Price / cup ($)</label><input id="price" type="number" step="0.1" min="0" value="2.0"><span class="small">Price above cap yields zero sales.</span></div>
+        <div class="divider"></div>
+        <div class="row">
+          <button id="startBtn" class="primary">Start Day ▶</button>
+          <button id="closeBtn">Close Day 🚪</button>
+          <button id="nextBtn">Next Day ⏭</button>
+          <button id="resetBtn">Reset</button>
+          <span class="small" id="dayLabel"></span>
+        </div>
+        <div id="daySummary" class="small" style="margin-top:6px"></div>
+      </div>
+
+      <!-- RIGHT: Shop, Upgrades & Stats -->
+      <div class="card">
+        <h2>Shop</h2>
+        <div class="shopRow">
+          <div class="item">🍋 Lemons <span class="small">$0.60 ea</span></div>
+          <div class="desc">🔻10% > 400 <span id="saleLemons" class="sale">SALE</span> · Qty <input id="buyLemonsQty" type="number" min="0" step="1" value="10" style="width:90px"></div>
+          <div class="actions"><button class="buyBtn" id="buyLemons">Buy</button><span class="small">Owned: <span id="lemInv">0</span></span></div>
+        </div>
+        <div class="shopRow">
+          <div class="item">🍬 Sugar <span class="small">$0.05 / spoon</span></div>
+          <div class="desc">🔻10% > 500 <span id="saleSugar" class="sale">SALE</span> · Qty <input id="buySugarQty" type="number" min="0" step="5" value="50" style="width:90px"></div>
+          <div class="actions"><button class="buyBtn" id="buySugar">Buy</button><span class="small">Owned: <span id="sugInv">0</span> spoons</span></div>
+        </div>
+        <div class="shopRow">
+          <div class="item">🧊 Ice <span class="small">$0.02 / cube</span></div>
+          <div class="desc">🔻10% > 300 <span id="saleIce" class="sale">SALE</span> · Qty <input id="buyIceQty" type="number" min="0" step="10" value="100" style="width:90px"></div>
+          <div class="actions"><button class="buyBtn" id="buyIce">Buy</button><span class="small">Owned: <span id="iceInv">0</span> cubes</span></div>
+        </div>
+        <div class="divider"></div>
+        <h2>Upgrades</h2>
+        <div class="upgRow">
+          <div class="item">🧊 Ice Box — $100</div>
+          <div class="desc">🧊 keep ice • cap 1k</div>
+          <div class="actions"><button class="buyBtn" id="buyIceBox">Buy</button><span id="iceBoxOwned" class="owned" style="display:none">Owned ✓</span></div>
+        </div>
+        <div class="upgRow">
+          <div class="item">🔊 Boombox — $500</div>
+          <div class="desc">👥×2 visitors</div>
+          <div class="actions"><button class="buyBtn" id="buyBoombox">Buy</button><span id="boomboxOwned" class="owned" style="display:none">Owned ✓</span></div>
+        </div>
+        <div class="upgRow">
+          <div class="item">🥤 Paper Cups — $500</div>
+          <div class="desc">💲 ideal ×1.5</div>
+          <div class="actions"><button class="buyBtn" id="buyPCups">Buy</button><span id="pcupsOwned" class="owned" style="display:none">Owned ✓</span></div>
+        </div>
+        <div class="upgRow">
+          <div class="item">🥢 Paper Straws — $200</div>
+          <div class="desc">💲 ideal ×1.5</div>
+          <div class="actions"><button class="buyBtn" id="buyPStraws">Buy</button><span id="pstrOwned" class="owned" style="display:none">Owned ✓</span></div>
+        </div>
+        <div class="upgRow">
+          <div class="item">🏪 Stall Upgrade — $500</div>
+          <div class="desc">⛏️ cap ×2</div>
+          <div class="actions"><button class="buyBtn" id="buyStall">Buy</button><span id="stallOwned" class="owned" style="display:none">Owned ✓</span></div>
+        </div>
+
+        <div class="divider"></div>
+        <h3 class="small">Tier 2</h3>
+        <div id="tier2" style="display:none">
+          <div class="upgRow">
+            <div class="item">🧊 Giant Ice Box — $500</div>
+            <div class="desc">🧊 keep ice • cap 10k</div>
+            <div class="actions"><button class="buyBtn" id="buyGiantIce">Buy</button><span id="giboxOwned" class="owned" style="display:none">Owned ✓</span></div>
+          </div>
+          <div class="upgRow">
+            <div class="item">🪑 Seating — $1000</div>
+            <div class="desc">👥×2 visitors</div>
+            <div class="actions"><button class="buyBtn" id="buySeating">Buy</button><span id="seatingOwned" class="owned" style="display:none">Owned ✓</span></div>
+          </div>
+          <div class="upgRow">
+            <div class="item">💝 Charity Donation — $1000</div>
+            <div class="desc">💲 ideal ×1.5</div>
+            <div class="actions"><button class="buyBtn" id="buyCharity">Buy</button><span id="charityOwned" class="owned" style="display:none">Owned ✓</span></div>
+          </div>
+          <div class="upgRow">
+            <div class="item">🌱 Ethical Source — $1000</div>
+            <div class="desc">💲 ideal ×1.5</div>
+            <div class="actions"><button class="buyBtn" id="buyEthical">Buy</button><span id="ethicalOwned" class="owned" style="display:none">Owned ✓</span></div>
+          </div>
+          <div class="upgRow">
+            <div class="item">🏪 Stall Upgrade — $1000</div>
+            <div class="desc">⛏️ cap ×2</div>
+            <div class="actions"><button class="buyBtn" id="buyStall2">Buy</button><span id="stall2Owned" class="owned" style="display:none">Owned ✓</span></div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <h3 class="small">Tier 3</h3>
+        <div id="tier3" style="display:none">
+          <div class="upgRow">
+            <div class="item">🏔️ Igloo — $5000</div>
+            <div class="desc">🧊 ice ∞</div>
+            <div class="actions"><button class="buyBtn" id="buyIgloo">Buy</button><span id="iglooOwned" class="owned" style="display:none">Owned ✓</span></div>
+          </div>
+          <div class="upgRow">
+            <div class="item">🍋 Orchard — $5000</div>
+            <div class="desc">🍋 lemons ∞</div>
+            <div class="actions"><button class="buyBtn" id="buyOrchard">Buy</button><span id="orchardOwned" class="owned" style="display:none">Owned ✓</span></div>
+          </div>
+          <div class="upgRow">
+            <div class="item">🍬 Plantation — $5000</div>
+            <div class="desc">🍬 sugar ∞</div>
+            <div class="actions"><button class="buyBtn" id="buyPlantation">Buy</button><span id="plantationOwned" class="owned" style="display:none">Owned ✓</span></div>
+          </div>
+          <div class="upgRow">
+            <div class="item">🏫 Buy a School — $10000</div>
+            <div class="desc">👥×10 visitors</div>
+            <div class="actions"><button class="buyBtn" id="buySchool">Buy</button><span id="schoolOwned" class="owned" style="display:none">Owned ✓</span></div>
+          </div>
+          <div class="upgRow">
+            <div class="item">🟣 Buy a Lambo — $100000</div>
+            <div class="desc">⛏️ cap ×10 • 💲 ideal ×10</div>
+            <div class="actions"><button class="buyBtn" id="buyLambo">Buy</button><span id="lamboOwned" class="owned" style="display:none">Owned ✓</span></div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="summary">
+          <div class="stat">💵 Cash: <strong class="money" id="cash">$0.00</strong></div>
+          <div class="stat">📈 Profit: <strong class="money" id="profit">$0.00</strong></div>
+          <div class="stat">🧮 Revenue: <span class="money" id="revenue">$0.00</span></div>
+          <div class="stat">🧾 Expenses: <span class="money" id="expenses">$0.00</span></div>
+          <div class="stat">🧉 Cups sold: <span id="sold">0</span></div>
+          <div class="stat">📅 Day: <span id="day">1</span></div>
+          <div class="stat">⭐ Level: <span id="level">1</span> · XP: <span id="xp">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h2>Today’s Customers</h2>
+      <div class="customers" id="customers"></div>
+      <div class="divider"></div>
+    </div>
+
+    <div class="card" id="progressCard" style="margin-top:16px">
+      <h2>Progress</h2>
+      <div class="small" id="achievementsList">No achievements yet.</div>
+    </div>
+
+    <div id="win" class="card win" style="display:none;margin-top:16px">
+      <h2>🎉 You won</h2>
+      Reach $1000 profit to win. You did it.
+    </div>
+  </div>
+
+<script>
+(function(){
+  // --- Constants
+  const COSTS = { lemon:0.60, sugar:0.05, ice:0.02, rent:50 };
+  const START_CASH = 100;
+  const BULK = { lemons:{threshold:400, discount:0.10}, sugar:{threshold:500, discount:0.10}, ice:{threshold:300, discount:0.10} };
+
+  // --- DOM helper
+  const el = id => document.getElementById(id);
+
+  // --- Day names and distributions
+  const DAYNAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const WEATHER_WEIGHTS = {Hot:0.35, Warm:0.35, Cool:0.2, Cold:0.1};
+
+  // --- Global state
+  const state = {
+    day: 1,
+    dowIndex: 0,
+    cash: START_CASH,
+    inventory: { lemons: 0, sugar: 0, ice: 0 },
+    totals: { revenue:0, expenses:0, sold:0 },
+    upgrades: { iceBox:false, stall:false, boombox:false, paperCups:false, paperStraws:false,
+      giantIce:false, seating:false, charity:false, ethical:false, stall2:false,
+      igloo:false, orchard:false, plantation:false, school:false, lambo:false },
+    forecast: [],
+    daysSinceEvent: 0,
+    weekSalePlan: { dayIndex: 0, item: 'lemons' },
+    saleToday: { active:false, item:null },
+    xp: 0,
+    level: 1,
+    perfectDays: 0,
+    totalCups: 0,
+    achievements: { perfect3:false, whisperer:false, cups500:false, level3:false },
+    dailyChallenge: { name:'', desc:'', rewardXP:0, effect:'' }
+  };
+
+  // --- Utility
+  function fmt(n){ return '$' + Number(n).toFixed(2); }
+  function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+  // --- Visitors, demand and caps
+  const weatherMult = { Hot:2.0, Warm:1.4, Cool:0.8, Cold:0.5 };
+  const dowMult = { Monday:0.9, Tuesday:0.8, Wednesday:0.9, Thursday:1.0, Friday:1.2, Saturday:1.6, Sunday:1.3 };
+  const eventMult = { None:1.0, Market:1.3, Festival:1.7, Concert:2.2 };
+
+  function rWeighted(obj){
+    const total = Object.values(obj).reduce((a,b)=>a+b,0);
+    let r = Math.random() * total;
+    for(const [k,v] of Object.entries(obj)){
+      if((r-=v) <= 0) return k;
+    }
+    return Object.keys(obj)[0];
+  }
+  function rollWeather(){ return rWeighted(WEATHER_WEIGHTS); }
+  function rollEvent(dow){
+    const weekend = (dow==='Friday'||dow==='Saturday'||dow==='Sunday');
+    const weights = weekend ? {None:0.55, Market:0.2, Festival:0.15, Concert:0.10}
+                            : {None:0.75, Market:0.15, Festival:0.07, Concert:0.03};
+    return rWeighted(weights);
+  }
+  function rollNonNoneEvent(dow){
+    const weekend = (dow==='Friday'||dow==='Saturday'||dow==='Sunday');
+    const weights = weekend ? {Market:0.5, Festival:0.3, Concert:0.2}
+                            : {Market:0.6, Festival:0.3, Concert:0.1};
+    return rWeighted(weights);
+  }
+
+  function estimateVisitors(w, d, e){
+    const base = 30;
+    const mult = (weatherMult[w]||1) * (dowMult[d]||1) * (eventMult[e]||1);
+    const est = Math.round(base * mult);
+    return clamp(est, 5, 300);
+  }
+
+  function basePriceCap(w, d, e){
+    let cap = ({Hot:4, Warm:3, Cool:2.5, Cold:2}[w]||2.5);
+    cap += ({None:0, Market:0.8, Festival:1.5, Concert:4}[e]||0);
+    cap += ({Monday:0, Tuesday:0, Wednesday:0, Thursday:0.2, Friday:0.5, Saturday:2, Sunday:1}[d]||0);
+    return clamp(cap, 1, 10);
+  }
+
+  function effectiveCap(base){
+    let cap = base;
+    if(state.upgrades.stall) cap *= 2;
+    if(state.upgrades.stall2) cap *= 2;
+    if(state.upgrades.lambo) cap *= 10;
+    return cap;
+  }
+  function capForDay(day, idx){
+    let cap = effectiveCap(day.cap);
+    if(idx===0 && state.dailyChallenge.effect==='cap-1') cap = Math.max(0, cap - 1);
+    return cap;
+  }
+  function todayCap(){ return capForDay(state.forecast[0], 0); }
+
+  function baseDemand(w){
+    return {Hot:0.80, Warm:0.60, Cool:0.35, Cold:0.20}[w] || 0.50;
+  }
+  function dayDemand(d){
+    return {Monday:0.95, Tuesday:0.85, Wednesday:0.95, Thursday:1.0, Friday:1.1, Saturday:1.3, Sunday:1.15}[d] || 1.0;
+  }
+  function eventDemand(e){
+    return {None:1.0, Market:1.15, Festival:1.35, Concert:1.6}[e] || 1.0;
+  }
+
+  function priceIdealMultiplier(){
+    let m=1;
+    if(state.upgrades.paperCups) m*=1.5;
+    if(state.upgrades.paperStraws) m*=1.5;
+    if(state.upgrades.charity) m*=1.5;
+    if(state.upgrades.ethical) m*=1.5;
+    if(state.upgrades.lambo) m*=10;
+    return m;
+  }
+  function displayVisitors(day){
+    let v = day.visitors;
+    if(state.upgrades.boombox) v *= 2;
+    if(state.upgrades.seating) v *= 2;
+    if(state.upgrades.school) v *= 10;
+    return v;
+  }
+
+  // --- UI helpers
+  const customersGrid = el('customers');
+  function buildCustomers(n){
+    customersGrid.innerHTML = '';
+    for(let i=0;i<n;i++){
+      const d = document.createElement('div');
+      d.className = 'cust';
+      d.textContent = '👤';
+      customersGrid.appendChild(d);
+    }
+  }
+
+  function renderForecast(){
+    const host = el('forecast');
+    host.innerHTML = '';
+    state.forecast.forEach((d,idx)=>{
+      const wrap = document.createElement('div');
+      wrap.className = 'fcard';
+      const when = idx===0 ? 'Today' : d.dow;
+      const hint = d.feedbackShort ? `<div class="meta hint">${d.feedbackShort}</div>` : '';
+      wrap.title = d.feedback || `Upcoming: ${d.weather} • ${d.event}`;
+      wrap.innerHTML = `<div class="name">${when}</div>
+        <div style="font-size:1.2rem">${d.emoji} ${d.weather}</div>
+        <div>${d.eventIcon} <span class="small">${d.event}</span></div>
+        <div class="meta">~${displayVisitors(d)} visitors</div>
+        <div class="meta">cap ${fmt(capForDay(d, idx))}${(idx===0 && state.dailyChallenge.effect==='cap-1') ? ' <span class="hint">–$1 challenge</span>' : ''}</div>${hint}`;
+      host.appendChild(wrap);
+    });
+  }
+
+  function updateBanner(){
+    const today = state.forecast[0];
+    el('visitorsPill').textContent = `Visitors today: ${displayVisitors(today)}`;
+    el('capPill').textContent = `Price cap: ${fmt(todayCap())}`;
+    el('day').textContent = state.day;
+    const profit = state.totals.revenue - state.totals.expenses;
+    const pct = clamp((profit/1000)*100,0,100);
+    el('progBar').style.width = pct + '%';
+    el('todayLine').textContent = `Today: ${today.dow} • ${today.weather} ${today.emoji} • ${today.eventIcon} ${today.event}`;
+    const win = profit >= 1000;
+    el('win').style.display = win ? 'block' : 'none';
+    el('winPill').style.display = win ? 'inline-block' : 'none';
+    applyForecastSkin(today.weather);
+  }
+
+  function updateStatsUI(){
+    el('cash').textContent = fmt(state.cash);
+    const profit = state.totals.revenue - state.totals.expenses;
+    el('profit').textContent = fmt(profit);
+    el('revenue').textContent = fmt(state.totals.revenue);
+    el('expenses').textContent = fmt(state.totals.expenses);
+    el('sold').textContent = state.totals.sold;
+    el('lemInv').textContent = Math.floor(state.inventory.lemons);
+    el('sugInv').textContent = Math.floor(state.inventory.sugar);
+    el('iceInv').textContent = Math.floor(state.inventory.ice);
+    el('xp').textContent = state.xp;
+    el('level').textContent = state.level;
+  }
+
+  // --- Sales, discounts and weekly sale
+  function isSaleActive(type){
+    return state.saleToday.active && state.saleToday.item === type;
+  }
+  function pickWeeklySalePlan(){
+    state.weekSalePlan = { dayIndex: Math.floor(Math.random()*7), item: ['lemons','sugar','ice'][Math.floor(Math.random()*3)] };
+  }
+  function updateSaleForToday(){
+    state.saleToday = { active: state.dowIndex === state.weekSalePlan.dayIndex, item: state.weekSalePlan.item };
+  }
+  function updateSaleUI(){
+    const map = { lemons: document.getElementById('saleLemons'), sugar: document.getElementById('saleSugar'), ice: document.getElementById('saleIce') };
+    Object.values(map).forEach(n=>{ if(n) n.style.display = 'none'; });
+    if(state.saleToday.active && map[state.saleToday.item]){
+      map[state.saleToday.item].style.display = 'inline-block';
+    }
+  }
+
+  function costFor(type, qty){
+    if(qty<=0 || !Number.isFinite(qty)) return 0;
+    let unit = 0, discount = 0;
+    if(type==='lemons'){
+      unit = COSTS.lemon;
+      if(isSaleActive('lemons')) unit *= 0.5;
+      if(qty > BULK.lemons.threshold) discount = BULK.lemons.discount;
+    } else if(type==='sugar'){
+      unit = COSTS.sugar;
+      if(isSaleActive('sugar')) unit *= 0.5;
+      if(qty > BULK.sugar.threshold) discount = BULK.sugar.discount;
+    } else if(type==='ice'){
+      unit = COSTS.ice;
+      if(isSaleActive('ice')) unit *= 0.5;
+      if(qty > BULK.ice.threshold) discount = BULK.ice.discount;
+    }
+    return qty * unit * (1 - discount);
+  }
+
+  function buy(type, qty){
+    qty = Math.max(0, Math.floor(qty));
+    let addOk = true;
+    if(type==='ice'){
+      let cap = null;
+      if(state.upgrades.igloo){ cap = Infinity; }
+      else if(state.upgrades.giantIce){ cap = 10000; }
+      else if(state.upgrades.iceBox){ cap = 1000; }
+      if(cap!==null && cap!==Infinity){
+        if(state.inventory.ice + qty > cap){ qty = Math.max(0, cap - state.inventory.ice); }
+        if(qty===0) addOk = false;
+      }
+    }
+    const c = costFor(type, qty);
+    if(c>state.cash || qty<=0 || !addOk) return false;
+    state.cash -= c;
+    state.totals.expenses += c;
+    if(type==='lemons') state.inventory.lemons += qty;
+    if(type==='sugar') state.inventory.sugar += qty;
+    if(type==='ice') state.inventory.ice += qty;
+    updateStatsUI();
+    updateBanner();
+    updateUpgradesUI();
+    return true;
+  }
+
+  function canMakeCup(lem, sug, ice){
+    const hasL = state.upgrades.orchard || state.inventory.lemons >= lem;
+    const hasS = state.upgrades.plantation || state.inventory.sugar >= sug;
+    const hasI = state.upgrades.igloo || state.inventory.ice >= ice;
+    return hasL && hasS && hasI;
+  }
+  function useInventory(lem, sug, ice){
+    if(!state.upgrades.orchard) state.inventory.lemons -= lem;
+    if(!state.upgrades.plantation) state.inventory.sugar -= sug;
+    if(!state.upgrades.igloo) state.inventory.ice -= ice;
+  }
+
+  // --- Gamification
+  function levelThreshold(){ return 100 + (state.level-1)*25; }
+  function addXP(n){
+    state.xp += n;
+    let leveled=false;
+    while(state.xp >= levelThreshold()){
+      state.xp -= levelThreshold();
+      state.level += 1;
+      leveled=true;
+    }
+    if(leveled){ /* optional toast */ }
+    updateStatsUI();
+  }
+  function listAchievements(){
+    const a=[];
+    if(state.achievements.perfect3) a.push('Perfect 3');
+    if(state.achievements.whisperer) a.push('Price Whisperer');
+    if(state.achievements.cups500) a.push('Ice Age');
+    if(state.achievements.level3) a.push('Getting Serious');
+    return a;
+  }
+  function updateAchievementsUI(){
+    const box=document.getElementById('achievementsList');
+    if(!box) return;
+    const names=listAchievements();
+    box.textContent = names.length ? 'Unlocked: ' + names.join(', ') : 'No achievements yet.';
+  }
+  function checkAchievements(msgs){
+    if(!state.achievements.perfect3 && state.perfectDays >= 3){ state.achievements.perfect3=true; state.cash += 50; msgs.push('Achievement: Perfect 3 (+$50)'); }
+    if(!state.achievements.whisperer && state.perfectDays >= 10){ state.achievements.whisperer=true; state.cash += 100; msgs.push('Achievement: Price Whisperer (+$100)'); }
+    if(!state.achievements.cups500 && state.totalCups >= 500){ state.achievements.cups500=true; state.cash += 50; msgs.push('Achievement: Ice Age (+$50)'); }
+    if(!state.achievements.level3 && state.level >= 3){ state.achievements.level3=true; state.cash += 50; msgs.push('Achievement: Getting Serious (+$50)'); }
+  }
+  function pickDailyChallenge(){
+    const opts=[
+      {name:'Tight Margin', desc:'Cap −$1. Sell ≥60% of visitors. Reward +30 XP.', effect:'cap-1', rewardXP:30},
+      {name:'Sugar Free', desc:'Use 0 sugar and sell ≥30% of visitors. Reward +25 XP.', effect:'none', rewardXP:25},
+      {name:'Premium Pricing', desc:'Price ≥125% of ideal and sell ≥50% of visitors. Reward +40 XP.', effect:'none', rewardXP:40},
+      {name:'Quick Serve', desc:'No stockouts. Reward +20 XP.', effect:'none', rewardXP:20}
+    ];
+    state.dailyChallenge = opts[Math.floor(Math.random()*opts.length)];
+  }
+  function updateChallengeUI(){
+    const c=state.dailyChallenge;
+    const box=document.getElementById('challenge');
+    if(box) box.textContent = c && c.name ? `${c.name}: ${c.desc}` : '—';
+  }
+
+  // --- Buy probability
+  function buyProbability({price, lemonsPer, sugarPer, icePer, weather}){
+    const today = state.forecast[0];
+    const base = baseDemand(weather) * dayDemand(today.dow) * eventDemand(today.event) * (1 + 0.01*(state.level-1));
+    const ideal = { lemons:1.5, sugar:2.0, ice:{Hot:4, Warm:3, Cool:2, Cold:1}[weather] };
+    const devL = lemonsPer - ideal.lemons;
+    const devS = sugarPer - ideal.sugar;
+    const devI = icePer - ideal.ice;
+    const dev2 = devL*devL + devS*devS + devI*devI;
+    const recipeFactor = Math.exp(-0.6 * dev2);
+
+    let target = ({Hot:3.0, Warm:2.5, Cool:2.0, Cold:1.5}[weather]) * priceIdealMultiplier();
+    let priceFactor;
+    if(price <= target){ priceFactor = 1 + 0.3 * (1 - price/target); }
+    else { priceFactor = 1 - 0.7 * ((price - target)/target); }
+    priceFactor = clamp(priceFactor, 0.2, 1.3);
+
+    const noise = 0.9 + Math.random()*0.2;
+    let p = base * recipeFactor * priceFactor * noise;
+    return clamp(p, 0, 0.95);
+  }
+
+  function makeFeedback({sold, visitors, blockedByCap, couldNotServe, lemonsPer, sugarPer, icePer, weather, price, capEff}){
+    const idealIce = {Hot:4, Warm:3, Cool:2, Cold:1}[weather];
+    const idealL = 1.5, idealS = 2.0;
+    const hints = [];
+    if(blockedByCap>0){
+      return {full:`Price above cap (${fmt(capEff)}). Lower price or upgrade stall.`, short:'💸 Price above cap'};
+    }
+    if(sold>=visitors){
+      return {full:'Perfect day. You served all customers.', short:'✅ Perfect'};
+    }
+    if(couldNotServe>0){ hints.push('Stock ran out'); }
+    const dL = lemonsPer - idealL; if(dL>0.6) hints.push('Too tart'); else if(dL<-0.6) hints.push('Not lemony enough');
+    const dS = sugarPer - idealS; if(dS>1.0) hints.push('Too sweet'); else if(dS<-1.0) hints.push('Not sweet enough');
+    const dI = icePer - idealIce; if(Math.abs(dI)>1) hints.push(dI>0?'Too much ice':'Needs more ice');
+    let target = ({Hot:3.0, Warm:2.5, Cool:2.0, Cold:1.5}[weather]) * priceIdealMultiplier();
+    if(price>target*1.15) hints.push('Price high for conditions');
+    if(price<target*0.6) hints.push('Price low; room to raise');
+
+    const short = (hints[0]||'Tune recipe');
+    return {full:hints.join(' · ')||'Tune recipe and pricing', short:`💡 ${short}`};
+  }
+
+  // --- Simulation
+  function startDay(){
+    el('startBtn').disabled = true;
+    el('nextBtn').disabled = false;
+
+    const today = state.forecast[0];
+    const weather = today.weather;
+    const lemonsPer = Math.max(0, parseFloat(el('lemPer').value) || 0);
+    const sugarPer = Math.max(0, parseFloat(el('sugPer').value) || 0);
+    const icePer = Math.max(0, parseFloat(el('icePer').value) || 0);
+    const price = Math.max(0, parseFloat(el('price').value) || 0);
+
+    let capEff = todayCap();
+    const visitors = displayVisitors(today);
+
+    buildCustomers(visitors);
+    const tiles = Array.from(customersGrid.children);
+
+    let soldToday = 0, revenueToday = 0, blockedByCap = 0, couldNotServe=0;
+
+    const overCap = price > capEff;
+
+    for(let i=0;i<tiles.length;i++){
+      const t = tiles[i];
+      if(overCap){
+        t.classList.add('skip');
+        t.title = 'Price above cap: no sales today';
+        blockedByCap++;
+        continue;
+      }
+      if(!canMakeCup(lemonsPer, sugarPer, icePer)){
+        couldNotServe++;
+        t.classList.add('skip');
+        t.title = 'Out of stock';
+        continue;
+      }
+      const p = buyProbability({price, lemonsPer, sugarPer, icePer, weather});
+      const buyCup = Math.random() < p;
+      if(buyCup){
+        useInventory(lemonsPer, sugarPer, icePer);
+        state.cash += price;
+        revenueToday += price;
+        state.totals.sold += 1;
+        soldToday += 1;
+        t.classList.add('buy');
+        t.textContent = '🧉';
+        t.title = 'Bought a cup';
+      } else {
+        t.classList.add('skip');
+        t.title = 'Passed';
+      }
+    }
+
+    // Daily rent
+    state.cash -= COSTS.rent;
+    state.totals.expenses += COSTS.rent;
+    state.totals.revenue += revenueToday;
+
+    // Ice spoilage unless upgraded
+    if(!(state.upgrades.iceBox || state.upgrades.giantIce || state.upgrades.igloo)){ state.inventory.ice = 0; }
+
+    const profit = state.totals.revenue - state.totals.expenses;
+
+    const fb = makeFeedback({sold:soldToday, visitors, blockedByCap, couldNotServe, lemonsPer, sugarPer, icePer, weather, price, capEff});
+    today.feedback = fb.full;
+    today.feedbackShort = fb.short;
+
+    const perfect = (soldToday>=visitors && blockedByCap===0);
+    const perfectNote = perfect ? ' <span class="ok">Perfect sales.</span>' : '';
+
+    // XP, challenge, achievements
+    let notes = [];
+    addXP(soldToday);
+    if(perfect){ addXP(10); state.perfectDays += 1; notes.push('Perfect day bonus +10 XP'); }
+    state.totalCups += soldToday;
+
+    let challengeXP = 0;
+    const ratio = visitors ? soldToday/visitors : 0;
+    let target = ({Hot:3.0, Warm:2.5, Cool:2.0, Cold:1.5}[weather]);
+    if(state.dailyChallenge.name==='Tight Margin'){ if(ratio>=0.6) challengeXP = 30; }
+    if(state.dailyChallenge.name==='Sugar Free'){ if(sugarPer===0 && ratio>=0.3) challengeXP = 25; }
+    if(state.dailyChallenge.name==='Premium Pricing'){ if(price >= 1.25*target && ratio>=0.5) challengeXP = 40; }
+    if(state.dailyChallenge.name==='Quick Serve'){ if(couldNotServe===0) challengeXP = 20; }
+    if(challengeXP>0){ addXP(challengeXP); notes.push(`Challenge complete: ${state.dailyChallenge.name} (+${challengeXP} XP)`); }
+
+    const achMsgs = [];
+    checkAchievements(achMsgs);
+
+    const analytics = `<br><span class="small">Analytics: ideal price ${fmt(target)} · price Δ ${fmt(price - target)} · missed by cap ${blockedByCap} · stockouts ${couldNotServe}</span>`;
+    const notesLine = notes.length ? `<br><span class="small">${notes.join(' · ')}</span>` : '';
+    const achLine = achMsgs.length ? `<br><span class="small ok">${achMsgs.join(' · ')}</span>` : '';
+
+    el('daySummary').innerHTML = `Visitors <strong>${tiles.length}</strong> · Sold <strong>${soldToday}</strong> cups · Revenue <strong class="money">${fmt(revenueToday)}</strong> · Rent <strong class="money">${fmt(COSTS.rent)}</strong> · Ice ${state.upgrades.iceBox||state.upgrades.giantIce||state.upgrades.igloo?'<strong>kept</strong>':'reset to <strong>0</strong>'} · Cash now <strong class="money">${fmt(state.cash)}</strong> · Total Profit <strong class="money">${fmt(profit)}</strong>${perfectNote}` + (blockedByCap?`<br><span class=\"warn\">${blockedByCap} turned away due to price above cap (${fmt(capEff)}).</span>`:'') + (fb.full?`<br><span class="small">Hint: ${fb.full}</span>`:'') + analytics + notesLine + achLine;
+
+    updateStatsUI();
+    updateBanner();
+    renderForecast();
+    updateAchievementsUI();
+    updateUpgradesUI();
+  }
+
+  function closeDay(){
+    const today = state.forecast[0];
+    today.feedback = 'Closed. No sales';
+    today.feedbackShort = '⏸️ Closed';
+    if(!(state.upgrades.iceBox || state.upgrades.giantIce || state.upgrades.igloo)){ state.inventory.ice = 0; }
+    el('daySummary').innerHTML = `Closed for the day. No rent charged. Ice ${state.upgrades.iceBox||state.upgrades.giantIce||state.upgrades.igloo?'<strong>kept</strong>':'reset to <strong>0</strong>'}.`;
+    updateStatsUI();
+    updateBanner();
+    renderForecast();
+    nextDay();
+  }
+
+  function makeDay(offset, forceEvent=false){
+    const dow = DAYNAMES[(state.dowIndex + offset) % 7];
+    const weather = rollWeather();
+    const event = forceEvent ? rollNonNoneEvent(dow) : rollEvent(dow);
+    const emoji = {Hot:'☀️', Warm:'⛅', Cool:'🌥️', Cold:'❄️'}[weather];
+    const eventIcon = {None:'—', Market:'🛍️', Festival:'🎉', Concert:'🎵'}[event];
+    const visitors = estimateVisitors(weather, dow, event);
+    const cap = basePriceCap(weather, dow, event);
+    return {dow, weather, event, emoji, eventIcon, visitors, cap};
+  }
+
+  function nextDay(){
+    state.day += 1;
+    const finished = state.forecast[0];
+    state.daysSinceEvent = finished.event === 'None' ? state.daysSinceEvent + 1 : 0;
+
+    state.dowIndex = (state.dowIndex + 1) % 7;
+    if(state.dowIndex === 0){ pickWeeklySalePlan(); }
+    updateSaleForToday();
+
+    pickDailyChallenge();
+    updateChallengeUI();
+
+    state.forecast.shift();
+    const forceEvent = state.daysSinceEvent >= 6; // ensure at least one event weekly
+    state.forecast.push(makeDay(state.forecast.length, forceEvent));
+
+    el('startBtn').disabled = false;
+    el('nextBtn').disabled = true;
+    el('daySummary').textContent = '';
+    buildCustomers(displayVisitors(state.forecast[0]));
+    renderForecast();
+    updateStatsUI();
+    updateBanner();
+    updateSaleUI();
+  }
+
+  function seedForecast(){
+    state.forecast = [];
+    for(let i=0;i<5;i++){ state.forecast.push(makeDay(i, false)); }
+    renderForecast();
+  }
+
+  function reset(){
+    state.day = 1;
+    state.dowIndex = 0;
+    state.cash = START_CASH;
+    state.inventory = {lemons:0, sugar:0, ice:0};
+    state.totals = {revenue:0, expenses:0, sold:0};
+    state.upgrades = { iceBox:false, stall:false, boombox:false, paperCups:false, paperStraws:false,
+      giantIce:false, seating:false, charity:false, ethical:false, stall2:false,
+      igloo:false, orchard:false, plantation:false, school:false, lambo:false };
+    state.daysSinceEvent = 0;
+    state.xp = 0; state.level = 1; state.perfectDays = 0; state.totalCups = 0;
+    state.achievements = { perfect3:false, whisperer:false, cups500:false, level3:false };
+    el('iceBoxOwned').style.display = 'none';
+    el('stallOwned').style.display = 'none';
+    el('boomboxOwned').style.display = 'none';
+    el('pcupsOwned').style.display = 'none';
+    el('pstrOwned').style.display = 'none';
+    el('giboxOwned').style.display = 'none';
+    el('seatingOwned').style.display = 'none';
+    el('charityOwned').style.display = 'none';
+    el('ethicalOwned').style.display = 'none';
+    el('stall2Owned').style.display = 'none';
+    el('iglooOwned').style.display = 'none';
+    el('orchardOwned').style.display = 'none';
+    el('plantationOwned').style.display = 'none';
+    el('schoolOwned').style.display = 'none';
+    el('lamboOwned').style.display = 'none';
+    document.getElementById('tier2').style.display = 'none';
+    document.getElementById('tier3').style.display = 'none';
+
+    pickWeeklySalePlan();
+    updateSaleForToday();
+    pickDailyChallenge();
+    updateChallengeUI();
+    updateSaleUI();
+
+    el('startBtn').disabled = false;
+    el('nextBtn').disabled = true;
+    el('daySummary').textContent = '';
+    seedForecast();
+    buildCustomers(displayVisitors(state.forecast[0]));
+    renderForecast();
+    updateStatsUI();
+    updateBanner();
+    updateAchievementsUI();
+    updateUpgradesUI();
+  }
+
+  // --- Upgrades
+  function updateUpgradesUI(){
+    const tier1Done = state.upgrades.iceBox && state.upgrades.boombox && state.upgrades.paperCups && state.upgrades.paperStraws && state.upgrades.stall;
+    const tier2Done = state.upgrades.giantIce && state.upgrades.seating && state.upgrades.charity && state.upgrades.ethical && state.upgrades.stall2;
+    document.getElementById('tier2').style.display = tier1Done ? 'block' : 'none';
+    document.getElementById('tier3').style.display = tier2Done ? 'block' : 'none';
+  }
+  function buyIceBox(){
+    if(state.upgrades.iceBox) return; const cost = 100; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.iceBox = true;
+    state.inventory.ice = Math.min(state.inventory.ice, 1000);
+    el('iceBoxOwned').style.display = 'inline';
+    updateStatsUI(); updateBanner(); renderForecast(); updateUpgradesUI();
+  }
+  function buyBoombox(){
+    if(state.upgrades.boombox) return; const cost = 500; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.boombox = true;
+    el('boomboxOwned').style.display = 'inline';
+    updateStatsUI(); updateBanner(); renderForecast(); updateUpgradesUI();
+  }
+  function buyPCups(){
+    if(state.upgrades.paperCups) return; const cost = 500; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.paperCups = true;
+    el('pcupsOwned').style.display = 'inline';
+    updateStatsUI(); updateBanner(); renderForecast(); updateUpgradesUI();
+  }
+  function buyPStraws(){
+    if(state.upgrades.paperStraws) return; const cost = 200; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.paperStraws = true;
+    el('pstrOwned').style.display = 'inline';
+    updateStatsUI(); updateBanner(); renderForecast(); updateUpgradesUI();
+  }
+  function buyStall(){
+    if(state.upgrades.stall) return; const cost = 500; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.stall = true;
+    el('stallOwned').style.display = 'inline';
+    renderForecast(); updateStatsUI(); updateBanner(); updateUpgradesUI();
+  }
+  // Tier 2
+  function buyGiantIce(){
+    if(state.upgrades.giantIce) return; const cost = 500; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.giantIce = true;
+    if(state.inventory.ice>10000) state.inventory.ice=10000;
+    el('giboxOwned').style.display = 'inline';
+    updateStatsUI(); updateBanner(); renderForecast(); updateUpgradesUI();
+  }
+  function buySeating(){
+    if(state.upgrades.seating) return; const cost = 1000; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.seating = true;
+    el('seatingOwned').style.display = 'inline';
+    updateStatsUI(); updateBanner(); renderForecast(); updateUpgradesUI();
+  }
+  function buyCharity(){
+    if(state.upgrades.charity) return; const cost = 1000; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.charity = true;
+    el('charityOwned').style.display = 'inline';
+    updateStatsUI(); updateBanner(); renderForecast(); updateUpgradesUI();
+  }
+  function buyEthical(){
+    if(state.upgrades.ethical) return; const cost = 1000; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.ethical = true;
+    el('ethicalOwned').style.display = 'inline';
+    updateStatsUI(); updateBanner(); renderForecast(); updateUpgradesUI();
+  }
+  function buyStall2(){
+    if(state.upgrades.stall2) return; const cost = 1000; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.stall2 = true;
+    el('stall2Owned').style.display = 'inline';
+    renderForecast(); updateStatsUI(); updateBanner(); updateUpgradesUI();
+  }
+  // Tier 3
+  function buyIgloo(){
+    if(state.upgrades.igloo) return; const cost = 5000; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.igloo = true;
+    el('iglooOwned').style.display = 'inline';
+    updateStatsUI(); updateBanner(); renderForecast(); updateUpgradesUI();
+  }
+  function buyOrchard(){
+    if(state.upgrades.orchard) return; const cost = 5000; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.orchard = true;
+    el('orchardOwned').style.display = 'inline';
+    updateStatsUI(); updateBanner(); renderForecast(); updateUpgradesUI();
+  }
+  function buyPlantation(){
+    if(state.upgrades.plantation) return; const cost = 5000; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.plantation = true;
+    el('plantationOwned').style.display = 'inline';
+    updateStatsUI(); updateBanner(); renderForecast(); updateUpgradesUI();
+  }
+  function buySchool(){
+    if(state.upgrades.school) return; const cost = 10000; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.school = true;
+    el('schoolOwned').style.display = 'inline';
+    updateStatsUI(); updateBanner(); renderForecast(); updateUpgradesUI();
+  }
+  function buyLambo(){
+    if(state.upgrades.lambo) return; const cost = 100000; if(state.cash < cost) return;
+    state.cash -= cost; state.totals.expenses += cost; state.upgrades.lambo = true;
+    el('lamboOwned').style.display = 'inline';
+    updateStatsUI(); updateBanner(); renderForecast(); updateUpgradesUI();
+  }
+
+  // --- Wire events
+  el('buyLemons').onclick = () => { const q = parseInt(el('buyLemonsQty').value,10) || 0; buy('lemons', q); };
+  el('buySugar').onclick = () => { const q = parseInt(el('buySugarQty').value,10) || 0; buy('sugar', q); };
+  el('buyIce').onclick = () => { const q = parseInt(el('buyIceQty').value,10) || 0; buy('ice', q); };
+  el('buyIceBox').onclick = buyIceBox;
+  el('buyBoombox').onclick = buyBoombox;
+  el('buyPCups').onclick = buyPCups;
+  el('buyPStraws').onclick = buyPStraws;
+  el('buyStall').onclick = buyStall;
+  // Tier 2
+  el('buyGiantIce').onclick = buyGiantIce;
+  el('buySeating').onclick = buySeating;
+  el('buyCharity').onclick = buyCharity;
+  el('buyEthical').onclick = buyEthical;
+  el('buyStall2').onclick = buyStall2;
+  // Tier 3
+  el('buyIgloo').onclick = buyIgloo;
+  el('buyOrchard').onclick = buyOrchard;
+  el('buyPlantation').onclick = buyPlantation;
+  el('buySchool').onclick = buySchool;
+  el('buyLambo').onclick = buyLambo;
+
+  el('startBtn').onclick = startDay;
+  el('closeBtn').onclick = closeDay;
+  el('nextBtn').onclick = nextDay;
+  el('resetBtn').onclick = reset;
+
+  // --- Init
+  pickWeeklySalePlan();
+  updateSaleForToday();
+  pickDailyChallenge();
+  updateChallengeUI();
+  seedForecast();
+  buildCustomers(displayVisitors(state.forecast[0]));
+  renderForecast();
+  updateStatsUI();
+  updateBanner();
+  updateSaleUI();
+  updateAchievementsUI();
+  updateUpgradesUI();
+  el('nextBtn').disabled = true;
+  applyForecastSkin(state.forecast[0].weather);
+})();
+function applyForecastSkin(weather){
+  const host = document.getElementById('forecast');
+  if(!host) return;
+  let g='linear-gradient(135deg,#0b1220,#0b1220)';
+  if(weather==='Hot') g='linear-gradient(135deg,#fde04733,#fb923c33)';
+  if(weather==='Warm') g='linear-gradient(135deg,#fef9c333,#86efac33)';
+  if(weather==='Cool') g='linear-gradient(135deg,#93c5fd33,#a5b4fc33)';
+  if(weather==='Cold') g='linear-gradient(135deg,#a5b4fc33,#e0e7ff33)';
+  host.style.background = g;
+}
+</script>
+</body>
+</html>
