@@ -97,15 +97,15 @@
         </div>
       </div>
       <div class="floaters" aria-hidden="true">
-        <div class="lemon">🍋</div>
-        <div class="lemon">🧃</div>
-        <div class="lemon">🧊</div>
-        <div class="lemon">🍋</div>
-        <div class="lemon">🌿</div>
-        <div class="lemon">🌳</div>
-        <div class="lemon">🍋</div>
-      </div>
-    </div>
+  <div class="lemon">🍋</div>
+  <div class="lemon">🧃</div>
+  <div class="lemon">🧊</div>
+  <div class="lemon">🍋</div>
+  <div class="lemon">🌿</div>
+  <div class="lemon">🌳</div>
+  <div class="lemon">🍋</div>
+</div>
+</div> <!-- end .hero -->
 
     <div class="grid">
       <!-- LEFT: Forecast + Controls -->
@@ -420,20 +420,20 @@
     });
   }
 
-  function updateBanner(){
-    const today = state.forecast[0];
-    el('visitorsPill').textContent = `Visitors today: ${displayVisitors(today)}`;
-    el('capPill').textContent = `Price cap: ${fmt(todayCap())}`;
-    el('day').textContent = state.day;
-    const profit = state.totals.revenue - state.totals.expenses;
-    const pct = clamp((profit/1000)*100,0,100);
-    el('progBar').style.width = pct + '%';
-    el('todayLine').textContent = `Today: ${today.dow} • ${today.weather} ${today.emoji} • ${today.eventIcon} ${today.event}`;
-    const win = profit >= 1000;
-    el('win').style.display = win ? 'block' : 'none';
-    el('winPill').style.display = win ? 'inline-block' : 'none';
-    applyForecastSkin(today.weather);
-  }
+function updateBanner(){
+  const today = state.forecast[0];
+  el('visitorsPill').textContent = `Visitors today: ${displayVisitors(today)}`;
+  el('capPill').textContent = `Price cap: ${fmt(todayCap())}`;
+  el('day').textContent = state.day;
+  const profit = state.totals.revenue - state.totals.expenses;
+  const pct = clamp((profit/1000)*100,0,100);
+  el('progBar').style.width = pct + '%';
+  el('todayLine').textContent = `Today: ${today.dow} • ${today.weather} ${today.emoji} • ${today.eventIcon} ${today.event}`;
+  const win = profit >= 1000;
+  el('win').style.display = win ? 'block' : 'none';
+  el('winPill').style.display = win ? 'inline-block' : 'none';
+  applyForecastSkin(today.weather);
+}
 
   function updateStatsUI(){
     el('cash').textContent = fmt(state.cash);
