@@ -5,38 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lemonade Stand</title>
 <style>
-  /* --- Light theme: paste at end of <style> --- */
-:root{
-  --bg:#fffef5;
-  --panel:#ffffff;
-  --muted:#64748b;
-  --text:#0f172a;
-  --accent:#facc15;
-  --ok:#16a34a;
-  --warn:#dc2626;
-  --card:#f8fafc;
-  --border:#e2e8f0;
-}
-html,body{
-  background:linear-gradient(180deg,#fffbe6,#ecfeff);
-  color:var(--text);
-}
-
-/* Light UI overrides */
-.pill{background:#f1f5f9;color:#334155}
-.card{background:var(--panel);border:1px solid var(--border)}
-.row label{color:var(--muted)}
-input[type=number], select{background:var(--panel);color:var(--text);border:1px solid var(--border)}
-button{background:#ffffff;color:var(--text);border:1px solid var(--border)}
-button.primary{background:var(--accent);border-color:#eab308;color:#111;font-weight:700}
-.divider{height:1px;background:var(--border);margin:10px 0}
-.customers .cust{background:var(--panel);border:1px solid var(--border)}
-.progress{height:10px;background:#eef2f7;border:1px solid var(--border)}
-.upgRow,.shopRow{background:var(--panel);border:1px solid var(--border)}
-#challenge{background:#fffaf0;border:1px solid #fde68a}
-.pillTag{background:#f1f5f9;border:1px solid var(--border)}
-.win{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
-
+  :root{--bg:#0f172a;--panel:#111827;--muted:#94a3b8;--text:#e5e7eb;--accent:#f59e0b;--ok:#22c55e;--warn:#ef4444;--card:#0b1220;--border:#1f2937}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:linear-gradient(180deg,#0b1220,#0f172a);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+  h1{font-size:1.4rem;margin:0}
+  h2{font-size:1.05rem;margin:0 0 .5rem 0;color:var(--muted);font-weight:600}
+  .app{max-width:1200px;margin:20px auto;padding:16px}
+  .stat{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:10px 12px;display:flex;gap:8px;align-items:center}
+  .pill{background:#1f2937;padding:2px 8px;border-radius:999px;color:var(--muted);font-size:.8rem}
+  .grid{display:grid;grid-template-columns: 1.2fr .8fr;gap:16px;margin-top:16px}
+  @media (max-width:1000px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0}
+  .row label{min-width:160px;color:var(--muted)}
+  input[type=number], select{background:#0b1220;color:var(--text);border:1px solid #263246;border-radius:10px;padding:8px;width:160px}
+  input[type=number]:disabled{opacity:.6}
+  button{background:#1f2937;color:var(--text);border:1px solid #263246;border-radius:12px;padding:10px 14px;cursor:pointer}
+  button.primary{background:var(--accent);border-color:#d97706;color:#1f1f1f;font-weight:700}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .small{font-size:.85rem;color:var(--muted)}
+  .money{font-variant-numeric:tabular-nums}
+  .customers{display:grid;grid-template-columns:repeat(10,1fr);gap:8px}
+  .cust{background:var(--card);border:1px solid var(--border);border-radius:12px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+  .cust.buy{outline:2px solid var(--ok)}
+  .cust.skip{outline:2px solid #334155;opacity:.6}
+  .summary{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media (max-width:640px){.summary{grid-template-columns:1fr}}
+  .divider{height:1px;background:#1f2937;margin:10px 0}
+  .ok{color:var(--ok)}
+  .warn{color:var(--warn)}
+  .win{background:#052e16;border:1px solid #14532d}
 
   /* Hero banner */
   .hero{position:relative;overflow:hidden;border-radius:16px;border:1px solid var(--border);background:radial-gradient(1200px 200px at -10% -30%, #ffe27a22, transparent),radial-gradient(1200px 200px at 110% 130%, #7ad0ff22, transparent);} 
