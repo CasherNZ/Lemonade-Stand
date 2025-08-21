@@ -104,6 +104,37 @@ html,body{
 
   /* Sale badge */
   .sale{display:none;margin-left:8px;background:conic-gradient(#ffd166 0 25%,#f59e0b 0 50%,#ffd166 0 75%,#f59e0b 0);color:#111;padding:4px 8px;border-radius:8px;font-weight:800}
+
+  /* === Minimal mobile mode (≤540px) === */
+@media (max-width:540px){
+  .heroInner .small,.heroInner .progress{display:none}
+  h2,.shopHead,.summary,.divider{display:none}
+  .app{padding:10px}
+  .card{padding:10px}
+  .row{margin:4px 0}
+  .row label{min-width:auto;width:34%;font-size:12px}
+  input[type=number]{width:66%}
+
+  /* Forecast: big emoji, tiny stats */
+  .forecast{grid-template-columns:repeat(5,1fr);gap:6px}
+  .fcard{padding:8px;text-align:center}
+  .fcard .name,.fcard .meta{display:none}
+  .fcard .big{font-size:44px;line-height:1}
+  .fcard .evt{font-size:28px;opacity:.9;margin-top:2px}
+  .fcard .mini{margin-top:4px;font-size:.8rem;color:var(--muted)}
+  .mini .i{font-size:18px;vertical-align:-2px;margin:0 2px}
+
+  /* Shop rows: icon + price only */
+  .shopRow{grid-template-columns:1fr auto;gap:8px;background:#0c1528}
+  .shopRow .item{font-size:24px}
+  .shopRow .desc,.shopRow .qty{display:none}
+  .buyBtn{padding:8px 12px;border-radius:10px}
+
+  /* Sticky action bar */
+  .actionsBar{position:sticky;bottom:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;z-index:50}
+  .actionsBar button{padding:12px;border-radius:12px}
+}
+
 </style>
   <!-- Mobile HUD + layout -->
 <style>
@@ -178,14 +209,13 @@ html,body{
         <div class="row"><label>🧊 Ice cubes / cup</label><input id="icePer" type="number" step="1" min="0" value="3"></div>
         <div class="row"><label>🏷️ Price / cup ($)</label><input id="price" type="number" step="0.1" min="0" value="2.0"><span class="small">Price above cap yields zero sales.</span></div>
         <div class="divider"></div>
-        <div class="row">
-          <button id="startBtn" class="primary">Start Day ▶</button>
-          <button id="closeBtn">Close Day 🚪</button>
-          <button id="nextBtn">Next Day ⏭</button>
-          <button id="resetBtn">Reset</button>
-          <span class="small" id="dayLabel"></span>
-        </div>
-        <div id="daySummary" class="small" style="margin-top:6px"></div>
+        <div class="actionsBar">
+  <button id="startBtn" class="primary">Start</button>
+  <button id="closeBtn">Close</button>
+  <button id="nextBtn">Next</button>
+  <button id="resetBtn">Reset</button>
+</div>
+<div id="daySummary" class="small" style="margin-top:6px"></div>
       </div>
 
       <!-- RIGHT: Shop, Upgrades & Stats -->
@@ -194,43 +224,32 @@ html,body{
 </div>
 
 <div class="shopRow">
-  <div class="item">🍋 Lemons</div>
-  <div class="desc"><span class="mono">$0.60 ea</span>
-    <span class="pillTag">10% @ 400+</span>
-    <span id="saleLemons" class="sale">SALE −50%</span>
-  </div>
-  <div class="qty"><input id="buyLemonsQty" type="number" min="0" step="1" value="10"></div>
+  <div class="item">🍋 <span class="mono">$0.60</span> <span id="saleLemons" class="sale">SALE −50%</span></div>
   <div class="actions">
+    <input id="buyLemonsQty" type="number" min="0" step="1" value="10" style="width:80px">
     <button class="buyBtn" id="buyLemons">Buy</button>
-    <span class="small">Owned: <span id="lemInv">0</span></span>
+    <span class="small">x<span id="lemInv">0</span></span>
   </div>
 </div>
 
 <div class="shopRow">
-  <div class="item">🍬 Sugar</div>
-  <div class="desc"><span class="mono">$0.05 / spoon</span>
-    <span class="pillTag">10% @ 500+</span>
-    <span id="saleSugar" class="sale">SALE −50%</span>
-  </div>
-  <div class="qty"><input id="buySugarQty" type="number" min="0" step="5" value="50"></div>
+  <div class="item">🥄 <span class="mono">$0.05</span> <span id="saleSugar" class="sale">SALE −50%</span></div>
   <div class="actions">
+    <input id="buySugarQty" type="number" min="0" step="5" value="50" style="width:80px">
     <button class="buyBtn" id="buySugar">Buy</button>
-    <span class="small">Owned: <span id="sugInv">0</span> spoons</span>
+    <span class="small">x<span id="sugInv">0</span></span>
   </div>
 </div>
 
 <div class="shopRow">
-  <div class="item">🧊 Ice</div>
-  <div class="desc"><span class="mono">$0.02 / cube</span>
-    <span class="pillTag">10% @ 300+</span>
-    <span id="saleIce" class="sale">SALE −50%</span>
-  </div>
-  <div class="qty"><input id="buyIceQty" type="number" min="0" step="10" value="100"></div>
+  <div class="item">🧊 <span class="mono">$0.02</span> <span id="saleIce" class="sale">SALE −50%</span></div>
   <div class="actions">
+    <input id="buyIceQty" type="number" min="0" step="10" value="100" style="width:80px">
     <button class="buyBtn" id="buyIce">Buy</button>
-    <span class="small">Owned: <span id="iceInv">0</span> cubes</span>
+    <span class="small">x<span id="iceInv">0</span></span>
   </div>
 </div>
+
 
 <div class="divider"></div>
 <h2>Upgrades</h2>
@@ -502,23 +521,24 @@ html,body{
     }
   }
 
-  function renderForecast(){
-    const host = el('forecast');
-    host.innerHTML = '';
-    state.forecast.forEach((d,idx)=>{
-      const wrap = document.createElement('div');
-      wrap.className = 'fcard';
-      const when = idx===0 ? 'Today' : d.dow;
-      const hint = d.feedbackShort ? `<div class="meta hint">${d.feedbackShort}</div>` : '';
-      wrap.title = d.feedback || `Upcoming: ${d.weather} • ${d.event}`;
-      wrap.innerHTML = `<div class="name">${when}</div>
-        <div style="font-size:1.2rem">${d.emoji} ${d.weather}</div>
-        <div>${d.eventIcon} <span class="small">${d.event}</span></div>
-        <div class="meta">~${displayVisitors(d)} visitors</div>
-        <div class="meta">cap ${fmt(capForDay(d, idx))}${(idx===0 && state.dailyChallenge.effect==='cap-1') ? ' <span class="hint">–$1 challenge</span>' : ''}</div>${hint}`;
-      host.appendChild(wrap);
-    });
-  }
+ function renderForecast(){
+  const host = el('forecast');
+  host.innerHTML = '';
+  state.forecast.forEach((d,idx)=>{
+    const cap = fmt(capForDay(d, idx));
+    const card = document.createElement('div');
+    card.className = 'fcard';
+    const evt = d.event==='None' ? '' : `<div class="evt" aria-label="${d.event}">${d.eventIcon}</div>`;
+    // Big weather emoji, optional event emoji, tiny line with visitors and cap
+    card.innerHTML = `
+      <div class="big" aria-label="${d.weather}">${d.emoji}</div>
+      ${evt}
+      <div class="mini"><span class="i">👥</span>${displayVisitors(d)} <span class="i">💲</span>${cap.replace('$','')}</div>
+    `;
+    host.appendChild(card);
+  });
+}
+
 
 function updateBanner(){
   const today = state.forecast[0];
@@ -528,7 +548,7 @@ function updateBanner(){
   const profit = state.totals.revenue - state.totals.expenses;
   const pct = clamp((profit/1000)*100,0,100);
   el('progBar').style.width = pct + '%';
-  el('todayLine').textContent = `Today: ${today.dow} • ${today.weather} ${today.emoji} • ${today.eventIcon} ${today.event}`;
+  el('todayLine').textContent = ''; // no sentence on mobile
   const win = profit >= 1000;
   el('win').style.display = win ? 'block' : 'none';
   el('winPill').style.display = win ? 'inline-block' : 'none';
