@@ -64,11 +64,15 @@
   .upgRow .desc{color:var(--muted);font-size:.9rem}
   .actions{display:flex;align-items:center;gap:8px}
 
-  /* Shop tidy rows */
-  .shopRow{display:grid;grid-template-columns:1.2fr 1fr auto;align-items:center;gap:10px;margin:8px 0;padding:6px 8px;border:1px solid var(--border);border-radius:12px;background:#0c1528}
-  .shopRow .item{font-weight:600}
-  .shopRow .desc{color:var(--muted);font-size:.9rem}
-  .buyBtn{background:var(--accent);border-color:#d97706;color:#111;padding:10px 16px;border-radius:12px;font-weight:700}
+ /* Shop tidy rows */
+.shopHead{display:grid;grid-template-columns:1.2fr 1fr .7fr auto;gap:10px;margin:6px 0 2px;color:var(--muted);font-size:.85rem}
+.shopRow{display:grid;grid-template-columns:1.2fr 1fr .7fr auto;align-items:center;gap:10px;margin:6px 0;padding:8px 10px;border:1px solid var(--border);border-radius:12px;background:#0c1528}
+.shopRow .item{font-weight:600}
+.shopRow .desc{color:var(--muted)}
+.shopRow .qty input{width:90px;text-align:center}
+.buyBtn{background:var(--accent);border-color:#d97706;color:#111;padding:10px 16px;border-radius:12px;font-weight:700}
+.pillTag{display:inline-block;padding:2px 6px;border-radius:999px;background:#1f2937;border:1px solid #22314b;margin-left:6px}
+.mono{font-variant-numeric:tabular-nums}
 
   /* Challenge box */
   #challenge{background:#1a2440;border:1px solid #22314b;padding:10px;border-radius:12px}
@@ -133,25 +137,51 @@
       </div>
 
       <!-- RIGHT: Shop, Upgrades & Stats -->
-      <div class="card">
-        <h2>Shop</h2>
-        <div class="shopRow">
-          <div class="item">🍋 Lemons <span class="small">$0.60 ea</span></div>
-          <div class="desc">🔻10% > 400 <span id="saleLemons" class="sale">SALE</span> · Qty <input id="buyLemonsQty" type="number" min="0" step="1" value="10" style="width:90px"></div>
-          <div class="actions"><button class="buyBtn" id="buyLemons">Buy</button><span class="small">Owned: <span id="lemInv">0</span></span></div>
-        </div>
-        <div class="shopRow">
-          <div class="item">🍬 Sugar <span class="small">$0.05 / spoon</span></div>
-          <div class="desc">🔻10% > 500 <span id="saleSugar" class="sale">SALE</span> · Qty <input id="buySugarQty" type="number" min="0" step="5" value="50" style="width:90px"></div>
-          <div class="actions"><button class="buyBtn" id="buySugar">Buy</button><span class="small">Owned: <span id="sugInv">0</span> spoons</span></div>
-        </div>
-        <div class="shopRow">
-          <div class="item">🧊 Ice <span class="small">$0.02 / cube</span></div>
-          <div class="desc">🔻10% > 300 <span id="saleIce" class="sale">SALE</span> · Qty <input id="buyIceQty" type="number" min="0" step="10" value="100" style="width:90px"></div>
-          <div class="actions"><button class="buyBtn" id="buyIce">Buy</button><span class="small">Owned: <span id="iceInv">0</span> cubes</span></div>
-        </div>
-        <div class="divider"></div>
-        <h2>Upgrades</h2>
+<div class="shopHead">
+  <div>Item</div><div>Unit & bulk</div><div>Qty</div><div></div>
+</div>
+
+<div class="shopRow">
+  <div class="item">🍋 Lemons</div>
+  <div class="desc"><span class="mono">$0.60 ea</span>
+    <span class="pillTag">10% @ 400+</span>
+    <span id="saleLemons" class="sale">SALE −50%</span>
+  </div>
+  <div class="qty"><input id="buyLemonsQty" type="number" min="0" step="1" value="10"></div>
+  <div class="actions">
+    <button class="buyBtn" id="buyLemons">Buy</button>
+    <span class="small">Owned: <span id="lemInv">0</span></span>
+  </div>
+</div>
+
+<div class="shopRow">
+  <div class="item">🍬 Sugar</div>
+  <div class="desc"><span class="mono">$0.05 / spoon</span>
+    <span class="pillTag">10% @ 500+</span>
+    <span id="saleSugar" class="sale">SALE −50%</span>
+  </div>
+  <div class="qty"><input id="buySugarQty" type="number" min="0" step="5" value="50"></div>
+  <div class="actions">
+    <button class="buyBtn" id="buySugar">Buy</button>
+    <span class="small">Owned: <span id="sugInv">0</span> spoons</span>
+  </div>
+</div>
+
+<div class="shopRow">
+  <div class="item">🧊 Ice</div>
+  <div class="desc"><span class="mono">$0.02 / cube</span>
+    <span class="pillTag">10% @ 300+</span>
+    <span id="saleIce" class="sale">SALE −50%</span>
+  </div>
+  <div class="qty"><input id="buyIceQty" type="number" min="0" step="10" value="100"></div>
+  <div class="actions">
+    <button class="buyBtn" id="buyIce">Buy</button>
+    <span class="small">Owned: <span id="iceInv">0</span> cubes</span>
+  </div>
+</div>
+
+<div class="divider"></div>
+<h2>Upgrades</h2>
         <div class="upgRow">
           <div class="item">🧊 Ice Box — $100</div>
           <div class="desc">🧊 keep ice • cap 1k</div>
