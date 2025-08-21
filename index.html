@@ -1052,23 +1052,24 @@ function wireDesigner(){
   };
 }
 
-  // --- Init
-  pickWeeklySalePlan();
-  updateSaleForToday();
-  pickDailyChallenge();
-  updateChallengeUI();
-  seedForecast();
-  buildCustomers(displayVisitors(state.forecast[0]));
-  renderForecast();
-  updateStatsUI();
-  updateBanner();
-  updateSaleUI();
-  updateAchievementsUI();
-  loadTheme();
-wireDesigner();
-  updateUpgradesUI();
-  el('nextBtn').disabled = true;
-  applyForecastSkin(state.forecast[0].weather);
+// --- Init
+loadTheme();           // apply saved theme before first paint
+wireDesigner();        // hook up the Theme panel
+
+pickWeeklySalePlan();
+updateSaleForToday();
+pickDailyChallenge();
+updateChallengeUI();
+seedForecast();
+buildCustomers(displayVisitors(state.forecast[0]));
+renderForecast();
+updateStatsUI();
+updateBanner();
+updateSaleUI();
+updateAchievementsUI();
+updateUpgradesUI();
+el('nextBtn').disabled = true;
+applyForecastSkin(state.forecast[0].weather);
 })();
 function applyForecastSkin(weather){
   const host = document.getElementById('forecast');
