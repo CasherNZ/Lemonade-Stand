@@ -15,11 +15,6 @@
   --accent:#facc15; /* lemon */
   --ok:#22c55e;
   --warn:#ef4444;
-    .pill{background:#0f1a2a;color:#9fb2c8}
-.card{background:var(--panel);border:1px solid var(--border)}
-input[type=number]{background:#0b1324;border:1px solid #22314b}
-button{background:#0f1a2a;border:1px solid #22314b}
-.divider{background:#1e293b}
 }
 html,body{
   margin:0;height:100%;
@@ -1033,7 +1028,14 @@ const THEMES = {
 };
 function setVars(v){ Object.entries(v).forEach(([k,val])=>document.documentElement.style.setProperty(k,val)); localStorage.setItem('ls-theme', JSON.stringify(v)); }
 function getVars(){ const cs=getComputedStyle(document.documentElement); const keys=['--bg','--panel','--card','--border','--muted','--text','--accent','--ok','--warn']; const out={}; keys.forEach(k=>out[k]=cs.getPropertyValue(k).trim()); return out; }
-function rgbToHex(s){ s=s.trim(); if(s.startsWith('#')) return s; const m=s.match(/rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)/); if(!m) return '#facc15'; const h=n=>('0'+parseInt(n,10).toString(16)).slice(-2); return '#'+h(m[1])+h(m[2])+h(m[3]); }
+function rgbToHex(s){
+  s = s.trim();
+  if (s.startsWith('#')) return s;
+  const m = s.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  if (!m) return '#facc15';
+  const h = n => ('0'+parseInt(n,10).toString(16)).slice(-2);
+  return '#'+h(m[1])+h(m[2])+h(m[3]);
+}
 function loadTheme(){ try{ const s=localStorage.getItem('ls-theme'); if(s) setVars(JSON.parse(s)); }catch{} }
 function wireDesigner(){
   const d=document.getElementById('designer');
