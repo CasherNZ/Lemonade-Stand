@@ -5,6 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lemonade Stand</title>
 <style>
+  /* --- Light theme: paste at end of <style> --- */
+:root{
+  --bg:#fffef5;
+  --panel:#ffffff;
+  --muted:#64748b;
+  --text:#0f172a;
+  --accent:#facc15;
+  --ok:#16a34a;
+  --warn:#dc2626;
+  --card:#f8fafc;
+  --border:#e2e8f0;
+}
+html,body{
+  background:linear-gradient(180deg,#fffbe6,#ecfeff);
+  color:var(--text);
+}
+
+/* Light UI overrides */
+.pill{background:#f1f5f9;color:#334155}
+.card{background:var(--panel);border:1px solid var(--border)}
+.row label{color:var(--muted)}
+input[type=number], select{background:var(--panel);color:var(--text);border:1px solid var(--border)}
+button{background:#ffffff;color:var(--text);border:1px solid var(--border)}
+button.primary{background:var(--accent);border-color:#eab308;color:#111;font-weight:700}
+.divider{height:1px;background:var(--border);margin:10px 0}
+.customers .cust{background:var(--panel);border:1px solid var(--border)}
+.progress{height:10px;background:#eef2f7;border:1px solid var(--border)}
+.upgRow,.shopRow{background:var(--panel);border:1px solid var(--border)}
+#challenge{background:#fffaf0;border:1px solid #fde68a}
+.pillTag{background:#f1f5f9;border:1px solid var(--border)}
+.win{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
+
 
   /* Hero banner */
   .hero{position:relative;overflow:hidden;border-radius:16px;border:1px solid var(--border);background:radial-gradient(1200px 200px at -10% -30%, #ffe27a22, transparent),radial-gradient(1200px 200px at 110% 130%, #7ad0ff22, transparent);} 
@@ -52,38 +84,6 @@
 
   /* Sale badge */
   .sale{display:none;margin-left:8px;background:conic-gradient(#ffd166 0 25%,#f59e0b 0 50%,#ffd166 0 75%,#f59e0b 0);color:#111;padding:4px 8px;border-radius:8px;font-weight:800}
-/* --- Light theme: paste at end of <style> --- */
-:root{
-  --bg:#fffef5;
-  --panel:#ffffff;
-  --muted:#64748b;
-  --text:#0f172a;
-  --accent:#facc15;
-  --ok:#16a34a;
-  --warn:#dc2626;
-  --card:#f8fafc;
-  --border:#e2e8f0;
-}
-html,body{
-  background:linear-gradient(180deg,#fffbe6,#ecfeff);
-  color:var(--text);
-}
-
-/* Light UI overrides */
-.pill{background:#f1f5f9;color:#334155}
-.card{background:var(--panel);border:1px solid var(--border)}
-.row label{color:var(--muted)}
-input[type=number], select{background:var(--panel);color:var(--text);border:1px solid var(--border)}
-button{background:#ffffff;color:var(--text);border:1px solid var(--border)}
-button.primary{background:var(--accent);border-color:#eab308;color:#111;font-weight:700}
-.divider{height:1px;background:var(--border);margin:10px 0}
-.customers .cust{background:var(--panel);border:1px solid var(--border)}
-.progress{height:10px;background:#eef2f7;border:1px solid var(--border)}
-.upgRow,.shopRow{background:var(--panel);border:1px solid var(--border)}
-#challenge{background:#fffaf0;border:1px solid #fde68a}
-.pillTag{background:#f1f5f9;border:1px solid var(--border)}
-.win{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
-
 </style>
 </head>
 <body>
