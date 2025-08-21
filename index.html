@@ -105,6 +105,26 @@ html,body{
   /* Sale badge */
   .sale{display:none;margin-left:8px;background:conic-gradient(#ffd166 0 25%,#f59e0b 0 50%,#ffd166 0 75%,#f59e0b 0);color:#111;padding:4px 8px;border-radius:8px;font-weight:800}
 </style>
+  <!-- Mobile HUD + layout -->
+<style>
+.hud{display:none;margin:10px 0;padding:8px;border:1px solid var(--border);border-radius:12px;background:var(--panel);position:sticky;top:6px;z-index:30}
+.hud{grid-template-columns:repeat(5,1fr);gap:8px;text-align:center}
+.hstat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 4px;font-variant-numeric:tabular-nums;font-weight:600}
+
+@media (max-width:540px){
+  .app{padding:10px}
+  .heroInner{grid-template-columns:1fr;gap:8px}
+  .grid{grid-template-columns:1fr}
+  .card{padding:10px}
+  .row label{min-width:120px}
+  .customers{grid-template-columns:repeat(6,1fr)}
+  .summary{grid-template-columns:1fr 1fr;gap:8px}
+  .shopHead,.shopRow{display:none}
+  #tier2,#tier3{margin-top:8px}
+  .hud{display:grid}
+}
+</style>
+
 </head>
 <body>
   <div class="app">
@@ -133,6 +153,15 @@ html,body{
   <div class="lemon">🍋</div>
 </div>
 </div> <!-- end .hero -->
+    
+<!-- Mobile HUD -->
+<div id="hud" class="hud">
+  <div class="hstat">💵 <span id="cashHud">$0.00</span></div>
+  <div class="hstat">📈 <span id="profitHud">$0.00</span></div>
+  <div class="hstat">🍋 <span id="lemHud">0</span></div>
+  <div class="hstat">🍬 <span id="sugHud">0</span></div>
+  <div class="hstat">🧊 <span id="iceHud">0</span></div>
+</div>
 
     <div class="grid">
       <!-- LEFT: Forecast + Controls -->
@@ -506,18 +535,32 @@ function updateBanner(){
   applyForecastSkin(today.weather);
 }
 
-  function updateStatsUI(){
-    el('cash').textContent = fmt(state.cash);
-    const profit = state.totals.revenue - state.totals.expenses;
-    el('profit').textContent = fmt(profit);
-    el('revenue').textContent = fmt(state.totals.revenue);
-    el('expenses').textContent = fmt(state.totals.expenses);
-    el('sold').textContent = state.totals.sold;
-    el('lemInv').textContent = Math.floor(state.inventory.lemons);
-    el('sugInv').textContent = Math.floor(state.inventory.sugar);
-    el('iceInv').textContent = Math.floor(state.inventory.ice);
-    el('xp').textContent = state.xp;
-    el('level').textContent = state.level;
+function updateStatsUI(){
+  const cashTxt = fmt(state.cash);
+  const profit = state.totals.revenue - state.totals.expenses;
+  const profitTxt = fmt(profit);
+
+  // main stats
+  el('cash').textContent = cashTxt;
+  el('profit').textContent = profitTxt;
+  el('revenue').textContent = fmt(state.totals.revenue);
+  el('expenses').textContent = fmt(state.totals.expenses);
+  el('sold').textContent = state.totals.sold;
+  el('lemInv').textContent = Math.floor(state.inventory.lemons);
+  el('sugInv').textContent = Math.floor(state.inventory.sugar);
+  el('iceInv').textContent = Math.floor(state.inventory.ice);
+  el('xp').textContent = state.xp;
+  el('level').textContent = state.level;
+
+  // mobile HUD mirrors
+  const safe = id => { const n = document.getElementById(id); return n ? n : { textContent: null }; };
+  safe('cashHud').textContent = cashTxt;
+  safe('profitHud').textContent = profitTxt;
+  safe('lemHud').textContent = Math.floor(state.inventory.lemons);
+  safe('sugHud').textContent = Math.floor(state.inventory.sugar);
+  safe('iceHud').textContent = Math.floor(state.inventory.ice);
+}
+
   }
 
   // --- Sales, discounts and weekly sale
