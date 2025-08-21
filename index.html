@@ -99,6 +99,14 @@ html,body{
   /* Forecast background wrapper will be set dynamically */
   #forecast{padding:8px;border-radius:12px}
 
+  /* Theme designer panel */
+.designer{position:fixed;top:16px;right:16px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px;min-width:230px;z-index:9999;display:none}
+.designer h3{margin:0 0 6px 0}
+.designer .g{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.designer button{padding:8px 10px}
+.chipBtn{background:#0f1a2a;border:1px solid #22314b;border-radius:999px;font-size:.85rem}
+#themeBtn{background:var(--accent);border-color:#d97706;color:#111;font-weight:700}
+
   /* Sale badge */
   .sale{display:none;margin-left:8px;background:conic-gradient(#ffd166 0 25%,#f59e0b 0 50%,#ffd166 0 75%,#f59e0b 0);color:#111;padding:4px 8px;border-radius:8px;font-weight:800}
 </style>
@@ -117,6 +125,7 @@ html,body{
           <span class="pill">Daily rent $50</span>
           <span id="capPill" class="pill">Price cap: $0.00</span>
           <span id="winPill" class="pill" style="display:none">Target reached ✅</span>
+          <button id="themeBtn" class="primary" style="padding:6px 10px;border-radius:999px">🎨 Theme</button>
         </div>
       </div>
       <div class="floaters" aria-hidden="true">
@@ -316,6 +325,24 @@ html,body{
       Reach $1000 profit to win. You did it.
     </div>
   </div>
+  <div id="designer" class="designer">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <h3>Theme</h3><button id="closeDesigner">✖</button>
+  </div>
+  <div class="g">
+    <button id="presetDark" class="chipBtn">Dark</button>
+    <button id="presetDarkSoft" class="chipBtn">Dark Soft</button>
+    <button id="presetLight" class="chipBtn">Light</button>
+    <button id="resetTheme" class="chipBtn">Reset</button>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <label style="min-width:auto">Accent</label>
+    <input id="accentPicker" type="color" value="#facc15" style="width:48px;height:32px;padding:0">
+  </div>
+  <div class="row"><button id="exportCss">Export CSS</button></div>
+  <div id="cssOut" class="small"></div>
+</div>
+
 
 <script>
 (function(){
@@ -998,6 +1025,33 @@ function updateBanner(){
   el('nextBtn').onclick = nextDay;
   el('resetBtn').onclick = reset;
 
+  // ==== Theme Designer ====
+const THEMES = {
+  dark:{'--bg':'#0a0f1a','--panel':'#0f172a','--card':'#0b1324','--border':'#1e293b','--muted':'#9fb2c8','--text':'#e6eef8','--accent':'#facc15','--ok':'#22c55e','--warn':'#ef4444'},
+  darkSoft:{'--bg':'#0b1220','--panel':'#111827','--card':'#0b1220','--border':'#22314b','--muted':'#9fb2c8','--text':'#e5e7eb','--accent':'#f59e0b','--ok':'#22c55e','--warn':'#ef4444'},
+  light:{'--bg':'#fffef5','--panel':'#ffffff','--card':'#f8fafc','--border':'#e2e8f0','--muted':'#64748b','--text':'#0f172a','--accent':'#facc15','--ok':'#16a34a','--warn':'#dc2626'}
+};
+function setVars(v){ Object.entries(v).forEach(([k,val])=>document.documentElement.style.setProperty(k,val)); localStorage.setItem('ls-theme', JSON.stringify(v)); }
+function getVars(){ const cs=getComputedStyle(document.documentElement); const keys=['--bg','--panel','--card','--border','--muted','--text','--accent','--ok','--warn']; const out={}; keys.forEach(k=>out[k]=cs.getPropertyValue(k).trim()); return out; }
+function rgbToHex(s){ s=s.trim(); if(s.startsWith('#')) return s; const m=s.match(/rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)/); if(!m) return '#facc15'; const h=n=>('0'+parseInt(n,10).toString(16)).slice(-2); return '#'+h(m[1])+h(m[2])+h(m[3]); }
+function loadTheme(){ try{ const s=localStorage.getItem('ls-theme'); if(s) setVars(JSON.parse(s)); }catch{} }
+function wireDesigner(){
+  const d=document.getElementById('designer');
+  document.getElementById('themeBtn').onclick=()=>{ d.style.display=(d.style.display==='block'?'none':'block'); };
+  document.getElementById('closeDesigner').onclick=()=>{ d.style.display='none'; };
+  document.getElementById('presetDark').onclick = ()=>setVars(THEMES.dark);
+  document.getElementById('presetDarkSoft').onclick = ()=>setVars(THEMES.darkSoft);
+  document.getElementById('presetLight').onclick = ()=>setVars(THEMES.light);
+  document.getElementById('resetTheme').onclick = ()=>{ localStorage.removeItem('ls-theme'); setVars(THEMES.darkSoft); };
+  const acc=document.getElementById('accentPicker');
+  acc.value=rgbToHex(getVars()['--accent']);
+  acc.oninput=(e)=>{ document.documentElement.style.setProperty('--accent', e.target.value); const v=getVars(); v['--accent']=e.target.value; localStorage.setItem('ls-theme', JSON.stringify(v)); };
+  document.getElementById('exportCss').onclick=()=>{
+    const v=getVars(); const lines=Object.entries(v).map(([k,val])=>`${k}:${val};`).join(' ');
+    document.getElementById('cssOut').textContent = `:root{ ${lines} }`;
+  };
+}
+
   // --- Init
   pickWeeklySalePlan();
   updateSaleForToday();
@@ -1010,6 +1064,8 @@ function updateBanner(){
   updateBanner();
   updateSaleUI();
   updateAchievementsUI();
+  loadTheme();
+  wireDesigner();
   updateUpgradesUI();
   el('nextBtn').disabled = true;
   applyForecastSkin(state.forecast[0].weather);
